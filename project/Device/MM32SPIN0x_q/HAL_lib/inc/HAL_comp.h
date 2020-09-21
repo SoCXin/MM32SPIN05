@@ -202,6 +202,24 @@ typedef struct {
 #define  COMP_CRV_Level_14_20               ((uint32_t)0x0000000D)
 #define  COMP_CRV_Level_15_20               ((uint32_t)0x0000000E)
 #define  COMP_CRV_Level_16_20               ((uint32_t)0x0000000F)
+
+
+#define COMP_CRV_Level_3_24 ((uint32_t)0x00000000)
+#define COMP_CRV_Level_4_24 ((uint32_t)0x00000001)
+#define COMP_CRV_Level_5_24 ((uint32_t)0x00000002)
+#define COMP_CRV_Level_6_24 ((uint32_t)0x00000003)
+#define COMP_CRV_Level_7_24 ((uint32_t)0x00000004)
+#define COMP_CRV_Level_8_24 ((uint32_t)0x00000005)
+#define COMP_CRV_Level_9_24 ((uint32_t)0x00000006)
+#define COMP_CRV_Level_10_24 ((uint32_t)0x00000007)
+#define COMP_CRV_Level_11_24 ((uint32_t)0x00000008)
+#define COMP_CRV_Level_12_24 ((uint32_t)0x00000009)
+#define COMP_CRV_Level_13_24 ((uint32_t)0x0000000A)
+#define COMP_CRV_Level_14_24 ((uint32_t)0x0000000B)
+#define COMP_CRV_Level_15_24 ((uint32_t)0x0000000C)
+#define COMP_CRV_Level_16_24 ((uint32_t)0x0000000D)
+#define COMP_CRV_Level_17_24 ((uint32_t)0x0000000E)
+#define COMP_CRV_Level_18_24 ((uint32_t)0x0000000F)
 /**
 * @}
 */

@@ -595,7 +595,20 @@ typedef struct {
 /**
 * @}
 */
-
+#define HSI_Value_Pll_OFF    ((uint32_t)48000000/6) /*!< Value of the Internal oscillator in Hz*/
+#define BKP_BASE              (APB1PERIPH_BASE + 0x2800)
+#define HDIV_BASE							(0x40030000)
+#define HDIV 								((HDIV_TypeDef *) HDIV_BASE)
+typedef struct
+{
+	__IO uint32_t DVDR;
+	__IO uint32_t DVSR;
+	__IO uint32_t QUOTR;
+	__IO uint32_t RMDR;
+	__IO uint32_t SR;
+	__IO uint32_t CR;
+	
+} HDIV_TypeDef;
 /** @addtogroup Peripheral_memory_map
 * @{
 */
@@ -856,6 +869,14 @@ typedef struct {
 #define  RCC_CFGR_PPRE2_DIV4                 ((uint32_t)0x00002800)        /*!< HCLK divided by 4 */
 #define  RCC_CFGR_PPRE2_DIV8                 ((uint32_t)0x00003000)        /*!< HCLK divided by 8 */
 #define  RCC_CFGR_PPRE2_DIV16                ((uint32_t)0x00003800)        /*!< HCLK divided by 16 */
+
+#define  RCC_CFGR_PLLSRC                     ((uint32_t)0x00010000)        /*!< CP PLL entry clock source */
+#define  RCC_CFGR_PLLXTPRE                   ((uint32_t)0x00020000)        /*!< CP HSE divider for PLL entry */
+#define  RCC_CR_PLLON                        ((uint32_t)0x01000000)        /*!< CP PLL enable */
+#define  RCC_CR_PLLRDY                       ((uint32_t)0x02000000)        /*!< CP PLL clock ready flag */
+#define  RCC_CFGR_SW_PLL                     ((uint32_t)0x00000002)        /*!< CP PLL selected as system clock */
+
+
 
 #define  RCC_CFGR_MCO                        ((uint32_t)0x07000000)        /*!< MCO[2:0] bits (Microcontroller Clock Output) */
 #define  RCC_CFGR_MCO_0                      ((uint32_t)0x01000000)        /*!< Bit 0 */

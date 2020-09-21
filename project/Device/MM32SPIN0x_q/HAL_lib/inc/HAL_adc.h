@@ -65,6 +65,10 @@ typedef struct {
 /** @defgroup ADC_Resolution
 * @{
 */
+
+#define ADCR_SWSTART_Set     ((uint32_t)0x00000100)
+#define ADCR_SWSTART_Reset   ((uint32_t)0xFFFFFEFF)
+
 #define ADC_Resolution_12b ((uint32_t)0x00000000)
 #define ADC_Resolution_11b ((uint32_t)0x00000080)
 #define ADC_Resolution_10b ((uint32_t)0x00000100)
@@ -79,6 +83,24 @@ typedef struct {
 /**
 * @brief  for ADC
 */
+/*seletec channle enable */
+#define CHEN0_ENABLE								((uint32_t)0x00000001)
+#define CHEN1_ENABLE								((uint32_t)0x00000002)
+#define CHEN2_ENABLE								((uint32_t)0x00000004)
+#define CHEN3_ENABLE								((uint32_t)0x00000008)
+#define CHEN4_ENABLE								((uint32_t)0x00000010)
+#define CHEN5_ENABLE								((uint32_t)0x00000020)
+#define CHEN6_ENABLE								((uint32_t)0x00000040)
+#define CHEN7_ENABLE								((uint32_t)0x00000080)
+#define CHEN8_ENABLE								((uint32_t)0x00000100)
+#define CHEN9_ENABLE								((uint32_t)0x00000200)
+#define CHEN10_ENABLE								((uint32_t)0x00004000)
+#define CHEN11_ENABLE								((uint32_t)0x00008000)
+#define CHALL_ENABLE                ((uint32_t)0x0000C3ff)
+
+#define CHEN_DISABLE								((uint32_t)0xFFFF3C00)
+
+
 
 #define ADC_PCLK2_PRESCARE_2						 ((uint32_t)0x00000000)
 #define ADC_PCLK2_PRESCARE_3						 ((uint32_t)0x00004000)

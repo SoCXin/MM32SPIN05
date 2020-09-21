@@ -79,18 +79,18 @@
 #define CHEN7_ENABLE				    ((uint32_t)0x00000080)
 #define CHEN8_ENABLE				    ((uint32_t)0x00000100)
 #define CHEN9_ENABLE				    ((uint32_t)0x00000200)
-#define CHEN10_ENABLE				    ((uint32_t)0x00000400)
-#define CHEN11_ENABLE				    ((uint32_t)0x00000800)
+//#define CHEN10_ENABLE				    ((uint32_t)0x00000400)
+//#define CHEN11_ENABLE				    ((uint32_t)0x00000800)
 #define CHEN12_ENABLE				    ((uint32_t)0x00001000)
 #define CHEN14_ENABLE				    ((uint32_t)0x00004000)
 #define CHEN15_ENABLE				    ((uint32_t)0x00008000)
 
-#define CHALL_ENABLE				    ((uint32_t)0x0000dfff)
+//#define CHALL_ENABLE				    ((uint32_t)0x0000dfff)
 
 #define TempSensor_ENABLE               CHEN14_ENABLE
 #define Vrefint_ENABLE                  CHEN15_ENABLE
 
-#define CHEN_DISABLE				    ((uint32_t)0xFFFF0000)
+//#define CHEN_DISABLE				    ((uint32_t)0xFFFF0000)
 
 /* ADC EXTSEL mask */
 #define ADCR_EXTSEL_Reset ((uint32_t)0xFFFFFF8F)

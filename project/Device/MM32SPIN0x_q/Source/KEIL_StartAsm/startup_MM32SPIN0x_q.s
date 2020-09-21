@@ -9,6 +9,7 @@
 ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
+
 Stack_Size      EQU     0x00000200
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
@@ -41,33 +42,33 @@ __Vectors       DCD     __initial_sp                   ; Top of Stack
                 DCD     Reset_Handler                  ; Reset Handler
                 DCD     NMI_Handler                    ; NMI Handler
                 DCD     HardFault_Handler              ; Hard Fault Handler
-                DCD     MemManage_Handler              ; MPU Fault Handler  		;;new 
-                DCD     BusFault_Handler               ; Bus Fault Handler		;;new
-                DCD     UsageFault_Handler             ; Usage Fault Handler	        ;;new
+                DCD     0                              ; Reserved
+                DCD     0                              ; Reserved
+                DCD     0                              ; Reserved
                 DCD     0                              ; Reserved
                 DCD     0                              ; Reserved
                 DCD     0                              ; Reserved
                 DCD     0                              ; Reserved
                 DCD     SVC_Handler                    ; SVCall Handler
-                DCD     DebugMon_Handler               ; Debug Monitor Handler 	        ;;new
+                DCD     0                              ; Reserved
                 DCD     0                              ; Reserved
                 DCD     PendSV_Handler                 ; PendSV Handler
                 DCD     SysTick_Handler                ; SysTick Handler
 
-; External Interrupts
+                ; External Interrupts
                 DCD     WWDG_IRQHandler                ; Window Watchdog
                 DCD     PVD_IRQHandler                 ; PVD through EXTI Line detect
-                DCD     0                              ; Reserved
+                DCD     RTC_IRQHandler                 ; RTC through EXTI Line & Tamper
                 DCD     FLASH_IRQHandler               ; FLASH
-                DCD     RCC_IRQHandler                 ; RCC 
+                DCD     RCC_CRS_IRQHandler             ; RCC & CRS
                 DCD     EXTI0_1_IRQHandler             ; EXTI Line 0 and 1
                 DCD     EXTI2_3_IRQHandler             ; EXTI Line 2 and 3
                 DCD     EXTI4_15_IRQHandler            ; EXTI Line 4 to 15
-                DCD     HWDIV_IRQHandler               ; HWDIV
+                DCD     0                              ; Reserved
                 DCD     DMA1_Channel1_IRQHandler       ; DMA1 Channel 1
                 DCD     DMA1_Channel2_3_IRQHandler     ; DMA1 Channel 2 and Channel 3
                 DCD     DMA1_Channel4_5_IRQHandler     ; DMA1 Channel 4 and Channel 5
-                DCD     ADC1_COMP_IRQHandler           ; ADC1
+                DCD     ADC_COMP_IRQHandler            ; ADC1 & COMP
                 DCD     TIM1_BRK_UP_TRG_COM_IRQHandler ; TIM1 Break, Update, Trigger and Commutation
                 DCD     TIM1_CC_IRQHandler             ; TIM1 Capture Compare
                 DCD     TIM2_IRQHandler                ; TIM2
@@ -83,7 +84,7 @@ __Vectors       DCD     __initial_sp                   ; Top of Stack
                 DCD     SPI1_IRQHandler                ; SPI1
                 DCD     SPI2_IRQHandler                ; SPI2
                 DCD     UART1_IRQHandler               ; UART1
-                DCD     UART2_IRQHandler               ; UART2
+				DCD     UART2_IRQHandler               ; UART2
 
                 
 __Vectors_End
@@ -93,43 +94,42 @@ __Vectors_Size  EQU  __Vectors_End - __Vectors
                 AREA    |.text|, CODE, READONLY
 
 ; Reset handler routine
-Reset_Handler   PROC
-                EXPORT  Reset_Handler                 [WEAK]
-                IMPORT  __main
-                IMPORT  SystemInit
+Reset_Handler    PROC
+                 EXPORT  Reset_Handler                 [WEAK]
+        IMPORT  __main
+        IMPORT  SystemInit
 
 
-
-                LDR     R0, =__initial_sp          ; set stack pointer 
-                MSR     MSP, R0  
+        LDR     R0, =__initial_sp          ; set stack pointer 
+        MSR     MSP, R0  
 
 ;;Check if boot space corresponds to test memory 
 
-                LDR R0,=0x00000004
-                LDR R1, [R0]
-                LSRS R1, R1, #24
-                LDR R2,=0x1F
-                CMP R1, R2
+        LDR R0,=0x00000004
+        LDR R1, [R0]
+        LSRS R1, R1, #24
+        LDR R2,=0x1F
+        CMP R1, R2
         
-                BNE ApplicationStart  
+        BNE ApplicationStart  
      
 ;; SYSCFG clock enable    
      
-                LDR R0,=0x40021018 
-                LDR R1,=0x00000001
-                STR R1, [R0]
+        LDR R0,=0x40021018 
+        LDR R1,=0x00000001
+        STR R1, [R0]
         
 ;; Set CFGR1 register with flash memory remap at address 0
 
-                LDR R0,=0x40010000 
-                LDR R1,=0x00000000
-                STR R1, [R0]
+        LDR R0,=0x40010000 
+        LDR R1,=0x00000000
+        STR R1, [R0]
 ApplicationStart         
-                LDR     R0, =SystemInit
-                BLX     R0
-                LDR     R0, =__main
-                BX      R0
-                ENDP
+                 LDR     R0, =SystemInit
+                 BLX     R0
+                 LDR     R0, =__main
+                 BX      R0
+                 ENDP
 
 ; Dummy Exception Handlers (infinite loops which can be modified)
 
@@ -142,28 +142,8 @@ HardFault_Handler\
                 EXPORT  HardFault_Handler              [WEAK]
                 B       .
                 ENDP
-MemManage_Handler\
-                PROC
-                EXPORT  MemManage_Handler              [WEAK]
-                B       .
-                ENDP
-BusFault_Handler\
-                PROC
-                EXPORT  BusFault_Handler               [WEAK]
-                B       .
-                ENDP
-UsageFault_Handler\
-                PROC
-                EXPORT  UsageFault_Handler             [WEAK]
-                B       .
-                ENDP
 SVC_Handler     PROC
                 EXPORT  SVC_Handler                    [WEAK]
-                B       .
-                ENDP
-DebugMon_Handler\
-                PROC
-                EXPORT  DebugMon_Handler               [WEAK]
                 B       .
                 ENDP
 PendSV_Handler  PROC
@@ -179,17 +159,16 @@ Default_Handler PROC
 
                 EXPORT  WWDG_IRQHandler                [WEAK]
                 EXPORT  PVD_IRQHandler                 [WEAK]
-
+                EXPORT  RTC_IRQHandler                 [WEAK]
                 EXPORT  FLASH_IRQHandler               [WEAK]
-                EXPORT  RCC_IRQHandler                 [WEAK]
+                EXPORT  RCC_CRS_IRQHandler             [WEAK]
                 EXPORT  EXTI0_1_IRQHandler             [WEAK]
                 EXPORT  EXTI2_3_IRQHandler             [WEAK]
                 EXPORT  EXTI4_15_IRQHandler            [WEAK]
-                EXPORT  HWDIV_IRQHandler               [WEAK]
                 EXPORT  DMA1_Channel1_IRQHandler       [WEAK]
                 EXPORT  DMA1_Channel2_3_IRQHandler     [WEAK]
                 EXPORT  DMA1_Channel4_5_IRQHandler     [WEAK]
-                EXPORT  ADC1_COMP_IRQHandler           [WEAK]
+                EXPORT  ADC_COMP_IRQHandler            [WEAK]
                 EXPORT  TIM1_BRK_UP_TRG_COM_IRQHandler [WEAK]
                 EXPORT  TIM1_CC_IRQHandler             [WEAK]
                 EXPORT  TIM2_IRQHandler                [WEAK]
@@ -199,25 +178,24 @@ Default_Handler PROC
                 EXPORT  TIM17_IRQHandler               [WEAK]
                 EXPORT  I2C1_IRQHandler                [WEAK]
                 EXPORT  SPI1_IRQHandler                [WEAK]
-                EXPORT  SPI2_IRQHandler                [WEAK]
+				EXPORT  SPI2_IRQHandler                [WEAK]
                 EXPORT  UART1_IRQHandler               [WEAK]
-                EXPORT  UART2_IRQHandler               [WEAK]
+				EXPORT  UART2_IRQHandler               [WEAK]
 
-
+		
 
 WWDG_IRQHandler
 PVD_IRQHandler
-        
+RTC_IRQHandler
 FLASH_IRQHandler
-RCC_IRQHandler
+RCC_CRS_IRQHandler
 EXTI0_1_IRQHandler
 EXTI2_3_IRQHandler
 EXTI4_15_IRQHandler
-HWDIV_IRQHandler
 DMA1_Channel1_IRQHandler
 DMA1_Channel2_3_IRQHandler
 DMA1_Channel4_5_IRQHandler
-ADC1_COMP_IRQHandler 
+ADC_COMP_IRQHandler 
 TIM1_BRK_UP_TRG_COM_IRQHandler
 TIM1_CC_IRQHandler
 TIM2_IRQHandler
@@ -230,7 +208,7 @@ SPI1_IRQHandler
 SPI2_IRQHandler
 UART1_IRQHandler
 UART2_IRQHandler
-
+    
 
                 B       .
 
@@ -241,30 +219,29 @@ UART2_IRQHandler
 ;*******************************************************************************
 ; User Stack and Heap initialization
 ;*******************************************************************************
-                IF      :DEF:__MICROLIB
+                 IF      :DEF:__MICROLIB
                 
-                EXPORT  __initial_sp
-                EXPORT  __heap_base
-                EXPORT  __heap_limit
+                 EXPORT  __initial_sp
+                 EXPORT  __heap_base
+                 EXPORT  __heap_limit
                 
-                ELSE
+                 ELSE
                 
-                IMPORT  __use_two_region_memory
-                EXPORT  __user_initial_stackheap
+                 IMPORT  __use_two_region_memory
+                 EXPORT  __user_initial_stackheap
                  
 __user_initial_stackheap
 
-                LDR     R0, =  Heap_Mem
-                LDR     R1, =(Stack_Mem + Stack_Size)
-                LDR     R2, = (Heap_Mem +  Heap_Size)
-                LDR     R3, = Stack_Mem
-                BX      LR
+                 LDR     R0, =  Heap_Mem
+                 LDR     R1, =(Stack_Mem + Stack_Size)
+                 LDR     R2, = (Heap_Mem +  Heap_Size)
+                 LDR     R3, = Stack_Mem
+                 BX      LR
 
-                ALIGN
+                 ALIGN
 
-                ENDIF
+                 ENDIF
 
-                END
+                 END
 
 ;******************** (C) COPYRIGHT 2019 MindMotion ********************
-

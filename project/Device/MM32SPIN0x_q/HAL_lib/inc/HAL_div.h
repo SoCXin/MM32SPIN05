@@ -44,11 +44,11 @@
 
 #define DIV_OVERFLOW 0x01
 
-#define SET_HWDivider(x, y) \
-    HWDIV->DVD = x;         \
-    HWDIV->DVS = y;
+//#define SET_HWDivider(x, y) \
+//    HWDIV->DVD = x;         \
+//    HWDIV->DVS = y;
 
-#define GET_HWDivider HWDIV->QUOT;
+//#define GET_HWDivider HWDIV->QUOT;
 
 
 

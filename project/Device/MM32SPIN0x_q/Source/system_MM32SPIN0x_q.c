@@ -56,10 +56,11 @@ If you are using different crystal you have to adapt those functions accordingly
 
 //#define SYSCLK_FREQ_HSE    HSE_VALUE
 
-#define SYSCLK_HSI_48MHz    48000000
+//#define SYSCLK_HSI_48MHz    48000000
 
-//#define SYSCLK_HSI_72MHz    72000000
+#define SYSCLK_HSI_72MHz    72000000
 
+#define VECT_TAB_OFFSET  0x0 /*!< Vector Table base offset field. */
 /**
 * @}
 */
@@ -77,7 +78,7 @@ uint32_t SystemCoreClock         = SYSCLK_HSI_72MHz;       /*!< System Clock Fre
 uint32_t SystemCoreClock         = HSI_VALUE;              /*!< System Clock Frequency (Core Clock) */
 #endif
 
-
+__I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 /**
 * @}
 */
@@ -92,6 +93,9 @@ static void SetSysClockTo48_HSI(void);
 static void SetSysClockTo72_HSI(void);
 #endif
 
+#ifdef DATA_IN_ExtSRAM
+static void SystemInit_ExtMemCtl(void); 
+#endif /* DATA_IN_ExtSRAM */
 
 /**
 * @}
@@ -107,6 +111,7 @@ static void SetSysClockTo72_HSI(void);
 */
 void SystemInit(void)
 {
+    RCC->APB2ENR|=0xc;
     /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
     /* Set HSION bit */
     RCC->CR |= (uint32_t)0x00000001;
@@ -126,6 +131,14 @@ void SystemInit(void)
     /* Configure the System clock frequency, HCLK, PCLK2 and PCLK1 prescalers */
     /* Configure the Flash Latency cycles and enable prefetch buffer */
     SetSysClock();
+    GPIOA->AFRH&=~0x0ff00000;
+    GPIOA->AFRL|=0x77777777;
+    GPIOA->AFRH|=0x70077777;
+    GPIOB->AFRL|=0x77777777;
+    GPIOB->AFRH|=0x77777777;
+    
+    RCC->APB2ENR&=~0xc;
+    
 }
 
 /**
@@ -188,10 +201,10 @@ static void SetSysClockToHSE(void)
         /* HCLK = SYSCLK */
         RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
 
-        /* PCLK2 = HCLK PPRE2 divide*/
+        /* PCLK2 = HCLK */
         RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
 
-        /* PCLK1 = HCLK PPRE1 divide*/
+        /* PCLK1 = HCLK */
         RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
 
         /* Select HSE as system clock source */
@@ -226,7 +239,7 @@ void SetSysClockTo48_HSI(void)
     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
 
     /* PCLK2 = HCLK */
-    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
+    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV2;
 
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
@@ -242,8 +255,7 @@ void SetSysClockTo48_HSI(void)
 #elif defined SYSCLK_HSI_72MHz
 void SetSysClockTo72_HSI(void)
 {
-    unsigned char temp = 0;
-    unsigned int temp1 = 0;
+    unsigned int temp = 0;   
     RCC->CR |= RCC_CR_HSION;
     while (!(RCC->CR & RCC_CR_HSIRDY))
         ;
@@ -251,35 +263,40 @@ void SetSysClockTo72_HSI(void)
     RCC->CR |= (1 << 20);
 
     RCC->CR &= ~(1 << 2);
-
     RCC->CFGR = RCC_CFGR_PPRE1_2;
-
     FLASH->ACR = FLASH_ACR_LATENCY_2 | FLASH_ACR_PRFTBE;
+    
+    RCC->CFGR = RCC_CFGR_PPRE1_DIV1|RCC_CFGR_PPRE2_DIV1;
+    
     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
 
-    /* PCLK2 = HCLK PRE2 divide*/
-    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
+    /* PCLK2 = HCLK */
+    RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV2;
 
-    /* PCLK1 = HCLK PRE1 divide */
+    /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
+    
     RCC->CFGR &= ~RCC_CFGR_SW;
 
-    temp1 = *(u16 *)0x1FFFF7FA;
-    if ((temp1 & 0xff) == 0xff) {
-        temp1 &= 0xff00;
+    temp = *(u16 *)0x1FFFF7FA;
+    if ((temp & 0xff) == 0xff) {
+        temp &= 0xff00;
     } else {
-        temp1 &= 0xff;
-        temp1 <<= 8;
+        temp &= 0xff;
+        temp <<= 8;
     }
-    temp1 |= (RCC->CR & 0xFFFF00ff) | 0xf8;
-    RCC->CR = temp1;
-    RCC->CFGR |= RCC_CFGR_SW_HSI;
+    temp |= (RCC->CR & 0xFFFF00ff) | 0xf8;
+    
+    RCC->CR = temp ;
+    
 
-    while (1) {
-        temp = RCC->CFGR;
-        temp = temp >> 2;
-        temp &= RCC_CFGR_SW;
-        if(temp == RCC_CFGR_SW_HSI)
+    RCC->CFGR |= 0x02;
+    
+    while( temp != 0x02 )
+    {
+        temp = RCC->CFGR>>2;
+        temp &= 0x03;
+        if(temp == 0x02)
             break;
     }
 }
