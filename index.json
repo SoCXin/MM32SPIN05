@@ -1,19 +1,22 @@
 {
     "name":"MM32SPIN05",
-    "series":["MM32SPIN05"],
+    "series":["MM32SPIN05","MM32SPIN06"],
     "type":"MCU",
     "Core":"Cortex-M0",
     "Freq":72,
     "Level":2,
     "description":"MindMotion ARM Cortex M0 motor MCU",
-    "peripheral": ["TIM","ADC","USB","UART","SPI","I2C","PWM","DMA"],
+    "peripheral": ["TIM","ADC","UART","SPI","I2C","PWM","COMP","DMA"],
+    "encryption": ["UID"],
     "package":["QFN32","QFN20","TSSOP20","LQFP32","LQFP48"],
     "SRAM":4,
     "Flash":32,
-    "GPIO":[7,17],
+    "GPIO":[16,39,16],
     "TIM": {
-        "resolution":[16,16,16],
-        "rate": 1024
+        "resolution":[16,32,16,16,16,16],
+        "systick": 24,
+        "WWDG": true,
+        "IWDG": true
     },
     "UART": {
         "num": 2,
@@ -22,29 +25,49 @@
         "ISO7816": 1,
         "more":["BUAD","LIN","IrDA"]
     },
+    "COMP": {
+        "num": 2,
+        "mark":1
+    },
     "ADC": {
         "num": 1,
-        "channel": 4,
-        "resolution": 8,
-        "rate": 2400
+        "channel": 13,
+        "resolution": 12,
+        "MSPS": 1
     },
-    "USB": {
+    "DMA": {
+        "num": 5,
+        "peripheral": ["TIM","ADC","UART","SPI","I2C"],
+        "resolution": 12,
+        "MSPS": 1
+    },
+    "I2C": {
         "num": 1,
-        "FIFO": 64,
-        "more":["FS","type-C","Host","Device"]
-    },
-    "PWR": {
-        "VDD": [2000,5500],
-        "Ivdd": 3.5,
-        "rate": 1024
+        "slave": true,
+        "master": true
     },
     "PWM": {
         "num": 2,
         "resolution": 8,
         "rate": 256
     },
+    "PWR": {
+        "VDD": [2000,5500],
+        "PVD": [1820,1810],
+        "IDD": [2.21,14.31],
+        "Imax": 120,
+        "rate": 1024
+    },
+    "CLK": {
+        "HSE": [2000,24000],
+        "HSI": [48000,72000],
+        "LSI": [31,75]
+    },
+    "EMC": {
+        "HSE": [2000,24000],
+        "ESD": [31,75]
+    },
     "upload": {
-        "ISP": true,
         "IAP": true,
         "SWD": true,
         "speed": 115200

@@ -26,8 +26,8 @@
 
 ### [选型建议](https://github.com/SoCXin)
 
-[MM32SPIN05](https://github.com/SoCXin/MM32SPIN05) 是电机类SoC中的入门级产品
+[MM32SPIN05](https://github.com/SoCXin/MM32SPIN05) 是MindMotion 电机类控制SPIN系列入门产品
 
-[MM32SPIN06](https://github.com/SoCXin/MM32SPIN06)获得更高性能和更多比较器，后者拥有LQFP64封装，主频96MHz，存储翻倍。
+[MM32SPIN06](https://github.com/SoCXin/MM32SPIN06) 在其基础上有更多比较器，拥有LQFP64封装，主频96MHz，存储翻倍。
 
 ###  [www.SoC.xin(芯)](http://www.SoC.Xin)
